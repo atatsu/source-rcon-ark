@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+from srcrcon.command import Command, Argument
+from srcrcon import SrcRCON
+
+
+class Base(Command):
+
+    def validate(self, response):
+        return True
+
+class ListPlayers(Base):
+    """List all connected players and their Steam ids."""
+    command_fmt = 'ListPlayers'
+
+
+class SaveWorld(Base):
+    """Save the game world."""
+    command_fmt = 'SaveWorld'
+
+
+class ChatToPlayer(Base):
+    """
+    Sends a direct chat message to the player specified
+    by their in-game player name.
+    """
+    command_fmt = 'ServerChatToPlayer "{playername}" {message}'
+
+    class PlayerName(Argument):
+        """Player's in-game name."""
+
+    class Message(Argument):
+        """Message to send."""
+
+
+class DestroyWildDinos(Base):
+    """
+    Destroys all unatmed creatures on the map. Useful for helping
+    newly released creatures to spawn.
+    """
+    command_fmt = 'DestroyWildDinos'
+
+
+class Chat(Base):
+    """Sends a chat message to all currently connected players."""
+    command_fmt = 'ServerChat {message}'
+
+    class Message(Argument):
+        """Message to send."""
+
+
+class GiveItemNumToPlayer(Base):
+    """
+    Adds the specified item to the player's inventory in the specified quantity
+    and with the specified quality.
+    """
+    command_fmt = ('GiveItemNumToPlayer {player_id} {item_id} {quantity} {quality} '
+                   '{force_blueprint}')
+
+    class PlayerId(Argument):
+        """Player id to give the item to."""
+
+    class ItemId(Argument):
+        """Item id to add."""
+
+    class Quantity(Argument):
+        """Number of items to add."""
+
+    class Quality(Argument):
+        """Quality of added items."""
+
+    class ForceBlueprint(Argument):
+        """`0` to add the item, `1` to add the item's blueprint."""
+
+
+class GiveItemToPlayer(Base):
+    """
+    Adds the specified item to the player's inventory (or its blueprint) in the specified
+    quantity and with the specified quality.
+    """
+    command_fmt = ('GiveItemToPlayer {player_id} {blueprint_path} {quantity} {quality} '
+                   '{force_blueprint}')
+
+    class PlayerId(Argument):
+        """(Integer[32]) Player id to give the item to."""
+
+    class BlueprintPath(Argument):
+        """(String) The blueprint path of the item to give."""
+
+    class Quantity(Argument):
+        """(Integer[32]) Number of items to add."""
+
+    class Quality(Argument):
+        """(Float) Quality of added items."""
+
+    class forceBlueprint(Argument):
+        """(Boolean) `0` to add the item, `1` to add the item's blueprint."""
+
+
+if __name__ == '__main__':
+    app = SrcRCON()
+    app.register_commands(
+        *[
+            Chat,
+            ChatToPlayer,
+            DestroyWildDinos,
+            GiveItemNumToPlayer,
+            GiveItemToPlayer,
+            ListPlayers,
+            SaveWorld
+        ],
+        title='Supported RCON commands'
+    )
+    app.start()
